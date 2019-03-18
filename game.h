@@ -10,6 +10,11 @@ typedef struct node{
 }node;
 
 void runGame(WINDOW*** gb, int x, int y, int mode);
+
 struct node* createNode(int x, int y, int v);
+
+void addToAdjacency(struct node** adj, struct node* node, int x, int y, int v);
+
+void adjResize(node** adj, int cap);
 
 #endif

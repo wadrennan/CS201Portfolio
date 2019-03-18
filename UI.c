@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <curses.h>
+#include <ncurses.h>
 #include "UI.h"
 #include <string.h>
 /*This file should be the UI functions for connect 4 corresponding to the signatures
@@ -15,6 +15,7 @@ in the UI.h file*/
 int getDimension(char ch, WINDOW* win){
   if(ch == 'x'){
     int x =  getmaxx(win);
+    printw("%d ", x);
     return x;
   }
   else{
@@ -29,7 +30,7 @@ WINDOW* drawCenteredWin(int x, int y, int width, int height){
   centerx = x/2;
   centery = y/2;
   subwin = newwin(height, width, centery-(height / 2), centerx - (width / 2));
-  box(subwin, 0, 0);
+//  box(subwin, 0, 0);
   wrefresh(subwin);
   return subwin;
 }
@@ -125,7 +126,120 @@ curry = curry+2;
 //**************************************************************************************************************
 int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
   start_color();
+  init_pair(1,COLOR_RED, COLOR_BLACK);
+  init_pair(2,COLOR_WHITE, COLOR_BLACK);
+  init_pair(3,COLOR_BLUE, COLOR_BLACK);
+  curs_set(FALSE);
+  noecho();
+  int currx = 0;
+  int curry = y-1;
+  int i = curry-1;
+  if(marked[curry][currx] != 0){
+    while(marked[curry][currx] != 0){
+    curry--;
+    if(curry == -1){
+      curry = y-1;
+      currx++;
+      }
+    }
+  }
   if(colorpair == 1){
+  wbkgd(gb[curry][currx], COLOR_PAIR(1));
+  }
+  else{
+    wbkgd(gb[curry][currx], COLOR_PAIR(3));
+  }
+  wrefresh(gb[curry][currx]);
+  keypad(gb[curry][currx],TRUE);
+  int ch = wgetch(gb[curry][currx]);
+  refresh();
+  while(ch != 's' ){ // q is quit s is select
+      keypad(gb[curry][currx],FALSE);
+    if(ch == KEY_LEFT  && currx-1 != -1){
+      if(marked[curry][currx-1] ==1 ){
+//        wbkgd(gb[curry][currx], COLOR_PAIR(3));
+    //  printw("left");
+    //  refresh();
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(2));
+
+      wrefresh(gb[curry][currx]);
+      currx--;
+      if(colorpair == 1){
+      wbkgd(gb[curry][currx], COLOR_PAIR(1));
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(3));
+      }
+      wrefresh(gb[curry][currx]);
+      }
+    }
+    else if(ch == KEY_RIGHT && currx+1 != x){
+      if(marked[curry][currx+1] ==1 ){
+      //  wbkgd(gb[curry][currx], COLOR_PAIR(3));
+    //  printw("right");
+    //  refresh();
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(2));
+
+      wrefresh(gb[curry][currx]);
+      currx++;
+      if(colorpair == 1){
+      wbkgd(gb[curry][currx], COLOR_PAIR(1));
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(3));
+      }
+      wrefresh(gb[curry][currx]);
+      }
+    }
+    else if(ch == KEY_DOWN  && curry+1 != y){
+      if(marked[curry+1][currx] ==1 ){
+    //    wbkgd(gb[curry][currx], COLOR_PAIR(3));
+
+    //  printw("down");
+    //  refresh();
+      }
+      else{
+      wbkgd(gb[curry][currx], COLOR_PAIR(2));
+      wrefresh(gb[curry][currx]);
+      curry++;
+      if(colorpair == 1){
+      wbkgd(gb[curry][currx], COLOR_PAIR(1));
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(3));
+      }
+      wrefresh(gb[curry][currx]);
+    }
+  }//*****************************************************************************************FIXME UP AND DOWN MEMORY LEAK TOP 2 ROWS???
+    else if(ch == KEY_UP  && curry-1 != -1){
+      if(marked[curry-1][currx] ==1 ){
+        //wbkgd(gb[curry][currx], COLOR_PAIR(3));
+        //printw("up");
+        //refresh();
+      }
+      else{
+      wbkgd(gb[curry][currx], COLOR_PAIR(2));
+      wrefresh(gb[curry][currx]);
+      curry--;
+      if(colorpair == 1){
+      wbkgd(gb[curry][currx], COLOR_PAIR(1));
+      }
+      else{
+        wbkgd(gb[curry][currx], COLOR_PAIR(3));
+      }
+      wrefresh(gb[curry][currx]);
+    }
+  }
+      keypad(gb[curry][currx],TRUE);
+    ch = wgetch(gb[curry][currx]);
+}// y is reversed!!!
+  wbkgd(gb[curry][currx], COLOR_PAIR(2));
+  wrefresh(gb[curry][currx]);
+/*  if(colorpair == 1){
   init_pair(1,COLOR_RED, COLOR_BLACK);
   init_pair(3,COLOR_BLUE, COLOR_BLACK);
 }
@@ -220,18 +334,23 @@ else{
     ch = wgetch(gb[curry][currx]);
 }
     wbkgd(gb[curry][currx], COLOR_PAIR(2));
-    wrefresh(gb[curry][currx]);
+    wrefresh(gb[curry][currx]);*/
   return currx;
 }
 
 void moveSpot(WINDOW*** gb, int x, int num, int y, int colorpair){
-  if(colorpair == 1){
+/*  if(colorpair == 1){
     init_pair(1,COLOR_RED, COLOR_BLACK);
   }
   else{
     init_pair(1,COLOR_BLUE, COLOR_BLACK);
+  }*/
+  if(colorpair ==1){
+    wbkgd(gb[y-1-num][x], COLOR_PAIR(1));
   }
- wbkgd(gb[y-1-num][x], COLOR_PAIR(1));
+ else{
+   wbkgd(gb[y-1-num][x], COLOR_PAIR(3));
+ }
  wrefresh(gb[y-1-num][x]);
 return;
 }
