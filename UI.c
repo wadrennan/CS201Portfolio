@@ -15,7 +15,7 @@ in the UI.h file*/
 int getDimension(char ch, WINDOW* win){
   if(ch == 'x'){
     int x =  getmaxx(win);
-    printw("%d ", x);
+  //  printw("%d ", x);
     return x;
   }
   else{
@@ -44,7 +44,7 @@ int* introScreen(WINDOW* win, int width, int height){
   wrefresh(win);
   getchar();
   wclear(win);
-  box(win, 0, 0);
+  //box(win, 0, 0);
   mvwprintw(win,height/2 -2, (width/4)-2,"Select a game mode!");
   mvwprintw(win,height/2 -1, (width/4)-2,"1. Single Player (not complete)");
   mvwprintw(win,height/2 , (width/4)-2,"2. Multiplayer (not complete)");
@@ -74,7 +74,7 @@ int* introScreen(WINDOW* win, int width, int height){
     }
     echo();
   wclear(win);
-  box(win,0,0);
+  //box(win,0,0);
   mvwprintw(win,height/2 -1, width/4,"Enter Board Width");
   curs_set(TRUE); //display cursor\
 //FIXME vet for non integer entered
@@ -86,7 +86,7 @@ int* introScreen(WINDOW* win, int width, int height){
   mvwscanw(win, height/2+2,width/4, "%d", &temp);
   game[2] = temp;
   wclear(win);
-  box(win,0,0);
+//  box(win,0,0);
  mvwprintw(win,height/2+3, width/4,"%d , %d, %d", game[0], game[1], game[2]);
   wrefresh(win);
 //  wrefresh(win);
@@ -125,6 +125,7 @@ curry = curry+2;
 }
 //**************************************************************************************************************
 int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
+  /* controls moving pieces, doesn't allow for collision of pieces, use arrow keys*/
   start_color();
   init_pair(1,COLOR_RED, COLOR_BLACK);
   init_pair(2,COLOR_WHITE, COLOR_BLACK);
@@ -156,7 +157,7 @@ int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
   while(ch != 's' ){ // q is quit s is select
       keypad(gb[curry][currx],FALSE);
     if(ch == KEY_LEFT  && currx-1 != -1){
-      if(marked[curry][currx-1] ==1 ){
+      if(marked[curry][currx-1] ==1 || marked[curry][currx-1] ==2 ){
 //        wbkgd(gb[curry][currx], COLOR_PAIR(3));
     //  printw("left");
     //  refresh();
@@ -176,7 +177,7 @@ int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
       }
     }
     else if(ch == KEY_RIGHT && currx+1 != x){
-      if(marked[curry][currx+1] ==1 ){
+      if(marked[curry][currx+1] ==1 || marked[curry][currx+1] ==2){
       //  wbkgd(gb[curry][currx], COLOR_PAIR(3));
     //  printw("right");
     //  refresh();
@@ -196,7 +197,7 @@ int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
       }
     }
     else if(ch == KEY_DOWN  && curry+1 != y){
-      if(marked[curry+1][currx] ==1 ){
+      if(marked[curry+1][currx] ==1 || marked[curry+1][currx] ==2){
     //    wbkgd(gb[curry][currx], COLOR_PAIR(3));
 
     //  printw("down");
@@ -216,7 +217,7 @@ int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
     }
   }//*****************************************************************************************FIXME UP AND DOWN MEMORY LEAK TOP 2 ROWS???
     else if(ch == KEY_UP  && curry-1 != -1){
-      if(marked[curry-1][currx] ==1 ){
+      if(marked[curry-1][currx] ==1 || marked[curry-1][currx] ==2 ){
         //wbkgd(gb[curry][currx], COLOR_PAIR(3));
         //printw("up");
         //refresh();
@@ -239,112 +240,12 @@ int selectCol(WINDOW*** gb, int x, int y, int colorpair, int** marked){
 }// y is reversed!!!
   wbkgd(gb[curry][currx], COLOR_PAIR(2));
   wrefresh(gb[curry][currx]);
-/*  if(colorpair == 1){
-  init_pair(1,COLOR_RED, COLOR_BLACK);
-  init_pair(3,COLOR_BLUE, COLOR_BLACK);
-}
-else{
-  init_pair(1,COLOR_BLUE, COLOR_BLACK);
-  init_pair(3,COLOR_RED, COLOR_BLACK);
-}
-  init_pair(2,COLOR_WHITE, COLOR_BLACK);
 
-  curs_set(FALSE);
-  noecho();
-  int currx = 0;
-  int curry = y-1;
-  int i = curry-1;
-  if(marked[curry][currx] != 0){
-    while(marked[curry][currx] != 0){
-    curry--;
-    if(curry == -1){
-      curry = y-1;
-      currx++;
-      }
-    }
-  }// y is reversed!!!
-  wbkgd(gb[curry][currx], COLOR_PAIR(1));
-  wrefresh(gb[curry][currx]);
-    keypad(gb[curry][currx],TRUE);
-  int ch = wgetch(gb[curry][currx]);
-
-  refresh();
-  while(ch != 's' ){ // q is quit s is select
-      keypad(gb[curry][currx],FALSE);
-    if(ch == KEY_LEFT  && currx-1 != -1){
-      if(marked[curry][currx-1] ==1 ){
-//        wbkgd(gb[curry][currx], COLOR_PAIR(3));
-    //  printw("left");
-    //  refresh();
-      }
-      else{
-        wbkgd(gb[curry][currx], COLOR_PAIR(2));
-
-      wrefresh(gb[curry][currx]);
-      currx--;
-      wbkgd(gb[curry][currx], COLOR_PAIR(1));
-      wrefresh(gb[curry][currx]);
-      }
-    }
-    else if(ch == KEY_RIGHT && currx+1 != x){
-      if(marked[curry][currx+1] ==1 ){
-      //  wbkgd(gb[curry][currx], COLOR_PAIR(3));
-    //  printw("right");
-    //  refresh();
-      }
-      else{
-        wbkgd(gb[curry][currx], COLOR_PAIR(2));
-
-      wrefresh(gb[curry][currx]);
-      currx++;
-      wbkgd(gb[curry][currx], COLOR_PAIR(1));
-      wrefresh(gb[curry][currx]);
-      }
-    }
-    else if(ch == KEY_DOWN  && curry+1 != y){
-      if(marked[curry+1][currx] ==1 ){
-    //    wbkgd(gb[curry][currx], COLOR_PAIR(3));
-
-    //  printw("down");
-    //  refresh();
-      }
-      else{
-      wbkgd(gb[curry][currx], COLOR_PAIR(2));
-      wrefresh(gb[curry][currx]);
-      curry++;
-      wbkgd(gb[curry][currx], COLOR_PAIR(1));
-      wrefresh(gb[curry][currx]);
-    }
-  }//*****************************************************************************************FIXME UP AND DOWN MEMORY LEAK TOP 2 ROWS???
-    else if(ch == KEY_UP  && curry-1 != -1){
-      if(marked[curry-1][currx] ==1 ){
-        //wbkgd(gb[curry][currx], COLOR_PAIR(3));
-        //printw("up");
-        //refresh();
-      }
-      else{
-      wbkgd(gb[curry][currx], COLOR_PAIR(2));
-      wrefresh(gb[curry][currx]);
-      curry--;
-      wbkgd(gb[curry][currx], COLOR_PAIR(1));
-      wrefresh(gb[curry][currx]);
-    }
-  }
-      keypad(gb[curry][currx],TRUE);
-    ch = wgetch(gb[curry][currx]);
-}
-    wbkgd(gb[curry][currx], COLOR_PAIR(2));
-    wrefresh(gb[curry][currx]);*/
   return currx;
 }
 
 void moveSpot(WINDOW*** gb, int x, int num, int y, int colorpair){
-/*  if(colorpair == 1){
-    init_pair(1,COLOR_RED, COLOR_BLACK);
-  }
-  else{
-    init_pair(1,COLOR_BLUE, COLOR_BLACK);
-  }*/
+  //Moves piece in selected column down to bottom-most unoccupied spot in column
   if(colorpair ==1){
     wbkgd(gb[y-1-num][x], COLOR_PAIR(1));
   }
@@ -353,4 +254,29 @@ void moveSpot(WINDOW*** gb, int x, int num, int y, int colorpair){
  }
  wrefresh(gb[y-1-num][x]);
 return;
+}
+
+char playAgain(int x, int y){
+
+  WINDOW* win = drawCenteredWin(x, y, 40,15);
+  mvwprintw(win, 15/2, 40/4, "Play Again ?");
+
+  wrefresh(win);
+
+  char answer;
+  while(answer!='n' && answer!= 'y'){
+  answer = getchar();
+  }
+  wclear(win);
+  wrefresh(win);
+  delwin(win);
+  return answer;
+}
+
+WINDOW* drawScoreBoard(int score, int match, int game){
+  WINDOW* win = newwin(15,40, 0,0);
+  wprintw(win, "win123456789101112---------------");
+  wrefresh(win);
+  refresh();
+  return win;
 }

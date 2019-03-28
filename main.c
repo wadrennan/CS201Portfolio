@@ -6,8 +6,12 @@
 //a[0] == gamemode, a[1] == x board size, a[2] == y board size
 int main(void){
   int mainx, mainy;
+  int p1count =0;
+  int p2count =0;
+  int winner;
   int* game;
   WINDOW* mwin;
+  char gamecheck = 'y';
   mwin = initscr(); //main window pointer (whole screen is a window)
   raw();
   cbreak();
@@ -24,8 +28,46 @@ int main(void){
   wrefresh(subwin);
   refresh();
   delwin(subwin);
-  WINDOW*** gameBoard = setUpGameBoard(mainx, mainy, game[1], game[2]);
-  runGame(gameBoard, game[1], game[2], game[0]);
+  int gamecount = 0;
+  WINDOW*** gameBoard ;
+  //WINDOW* scoreboard = drawScoreBoard();
+  while(gamecheck == 'y'){
+
+  gameBoard = setUpGameBoard(mainx, mainy, game[1], game[2]);
+  refresh();
+//getch();
+  winner = runGame(gameBoard, game[1], game[2], game[0]);
+  gamecount++;
+  if(winner == 1){
+    p1count++;
+  }
+  else if(winner ==2){
+    p2count++;
+  }
+    clear();
+    refresh();
+  for(int i = 0; i < game[1]; i++){
+    for(int j = 0; j < game[2]; j++){
+
+      wclear(gameBoard[j][i]);
+      wrefresh(gameBoard[j][i]);
+      delwin(gameBoard[j][i]);
+    }
+  }
+//  clear();
+mvprintw(0,0,"Match count: %d",gamecount);
+mvprintw(1,0,"P1 Wins: %d", p1count);
+mvprintw(2,0,"P2 Wins: %d", p2count);
+refresh();
+  gamecheck = playAgain(mainx, mainy);
+
+}
+
+
+
+  delwin(stdscr);
+  endwin();
   return 0;
 }
+
 //maybe make this an array of various dimensions such as center etc?
