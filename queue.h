@@ -14,13 +14,13 @@ void queueResize(int* arr, int size, int** marked);
 
 int peek(int* tail, int* arr);
 
-int pop(int* tail, int* arr);
+int pop(int* arr, int* tail);
 
-void push(int data, int* tail, int* arr);
+void push(int* tail, int* arr, int val);
 
 void stackResize(int* arr, int size);
 
-void initStack(int* head, int* tail);
+void initializeStack(int* head, int* tail);
 
 
 #endif

@@ -1,2 +1,2 @@
-main: main.c UI.c game.c
-	gcc  main.c UI.c game.c -lncurses -o main
+main: main.c UI.c game.c queue.c
+	gcc  main.c UI.c game.c queue.c -lncurses -o main

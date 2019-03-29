@@ -22,4 +22,6 @@ int checkForWinner(int p, int count, int** marked, int x, int y, int width, int 
 int computerSelect(WINDOW*** gb, int x, int y, int colorpair, int** marked);
 
 int checkPath(int* t, int** marked, int x, int y); // checks path to see if it's cut off
+
+int DFS(node** adj, int** marked, int x, int y, int count);
 #endif

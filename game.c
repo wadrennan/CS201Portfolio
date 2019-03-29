@@ -57,6 +57,7 @@ void addToAdjacency(struct node** adj, struct node* newNode, int x, int y, int v
       temp2->y = adj[i]->y;
       temp2->v = adj[i]->v;
       if(adj[i]->x == x && (adj[i]->y == y-1 || adj[i]->y == y+1)){
+        printw("(%d,%d) is type 1 to (%d,%d) ",temp2->x, temp2->y,temp->x, temp->y);
         temp2->type = 1;
       }
       else{
@@ -66,8 +67,8 @@ void addToAdjacency(struct node** adj, struct node* newNode, int x, int y, int v
       temp2->next = NULL;
       temp2->adj = NULL;
     temp->next = temp2;
-      //printw(" %d added %d to list", newNode->v, temp2->v);
-      //refresh();
+  /*    printw(" %d added %d to list", newNode->v, temp2->v);
+      refresh();*/
       /////////////////////////////////////////////////////////////////////
       struct node* temp3 = malloc(sizeof(node));
       struct node* temp4 = malloc(sizeof(node));
@@ -95,7 +96,7 @@ void addToAdjacency(struct node** adj, struct node* newNode, int x, int y, int v
       //printw("adj[%d]->next = node %d ", i, newNode->v);
       //refresh();
     }
-    if((adj[i]->x == x+1 || adj[i]->x == x-1) && (adj[i]->y == y-1 || adj[i]->y == y+1)){
+   /*if((adj[i]->x == x+1 || adj[i]->x == x-1) && (adj[i]->y == y-1 || adj[i]->y == y+1)){
       //printw("diagonal ");
       //refresh();
       struct node* temp = malloc(sizeof(node));
@@ -142,6 +143,7 @@ void addToAdjacency(struct node** adj, struct node* newNode, int x, int y, int v
       new = new->next;
     }
   }*/
+}
   return;
 }
 
@@ -329,7 +331,7 @@ startx++;
   return 0;
 }
 
-int checkPath(int* t, node** adj, int** marked, int x, int y, int size){
+int checkPath(int t[3], node** adj, int** marked, int x, int y, int size){
   int* xvals=malloc(sizeof(int)*size);
   int* yvals = malloc(sizeof(int)*size);
   for(int j =0; j < size;j++){
@@ -356,15 +358,16 @@ int checkPath(int* t, node** adj, int** marked, int x, int y, int size){
             if(marked[yvals[2]-1][xvals[0]] == 0){
               return xvals[0];
             }
-            for(int i = 0; i < 3; i++){
+          /*  for(int i = 0; i < 3; i++){
               printw(" looping ");
               refresh();
               if(marked[yvals[i]][xvals[i]] == 0){
                 return xvals[i];
               }
             } //give back next column
-          }
+          }*/
         }
+
         if(yvals[0] == yvals[1]){
           printw(" horizontal ");
           refresh();
@@ -434,21 +437,130 @@ int checkPath(int* t, node** adj, int** marked, int x, int y, int size){
     /*else{
       printw(" not valid diagonal ");
       refresh();
-      return -1;
+    return -1;
     }*/
-    size--;
+    //size--;
+    return -1;
   }
 
   if(size == 2){
+    int min, max;
+    if(xvals[0] > xvals[1]){
+      min = 1;
+      max = 0;
+    }
+    else if(xvals[0]<xvals[1]){
+      min = 0;
+      max = 1;
+    }
+    else{
+      min = 0;
+      max = 0;
+    }
+    int miny, maxy;
+    if(yvals[0] > yvals[1]){
+      miny = 1;
+      maxy = 0;
+    }
+    else if(yvals[0] < yvals[1]){
+      miny = 0;
+      maxy = 1;
+    }
+    else{
+      miny = 0;
+      maxy = 0;
+    }
+    printw("%d, %d, %d, %d  ",xvals[0], xvals[1],yvals[0],yvals[1]);
+    refresh();
+    if(xvals[0] == xvals[1]){
+      printw(" vertical ");
+      refresh();
+      if(yvals[0] == yvals[1]){
+        printw(" error in vertical 2 ");
+        refresh();
+        return -1;
+      }
+      if(yvals[miny]-1 != -1){
+      if(marked[yvals[miny]-1][xvals[0]] == 0){
+        return xvals[0];
+      }
+    }
+        if(xvals[0] +1 != x){
+          if(marked[yvals[miny]][xvals[0]+1] ==0){
+            return xvals[0]+1;
+          }
+        }
+      }
+
+
+    if(yvals[0] == yvals[1]){
+      printw(" horizontal ");
+      if(xvals[0] == xvals[1]){
+        printw(" error in horizontal 2 ");
+        refresh();
+        return -1;
+      }
+
+      if(xvals[max]+1 != x){ // look right
+        printw(" 2 right %d %d     %d   ",max, min, marked[yvals[1]][xvals[max]+1]);
+        refresh();
+        if(marked[yvals[1]][xvals[max]+1] == 0){
+          return xvals[max]+1;
+        }
+      }
+      if(xvals[min]-1 != -1){
+        printw(" 2 left ");
+        refresh();
+        if(marked[yvals[1]][xvals[min]-1] == 0){//look left
+          return xvals[min]-1;
+        }
+      }
+      if(yvals[0]-1 != -1){
+        printw(" 2 up max / min");
+        refresh(); //look up from max
+        if(marked[yvals[0]-1][max] == 0){
+          return xvals[max];
+        }
+        if(marked[yvals[0]-1][min] == 0){
+          return xvals[min];
+        }
+      }
+      refresh();
+    }
+
+
+    if(yvals[max]-1 == yvals[min]){
+      if(xvals[min]!=xvals[max]){
+        if(min == miny){
+          if(xvals[min]-1 != -1){
+            return xvals[min]-1;
+          }
+          if(yvals[min]-1 != -1){
+            return xvals[min];
+          }
+        }
+        if(xvals[max]+1 != x){
+              return xvals[max]+1;
+          }
+          if(yvals[max] -1 != -1){
+            return xvals[max];
+          }
+        }
+      }
+
+
   /*  printw(" path of size 2: %d, %d ",xvals[1], yvals[1]);
     refresh();
     printw("  y=%d ",yvals[1]);*/
-    if(xvals[0] == xvals[1]){ // x vals stay same
+/*    if(xvals[0] == xvals[1]){ // x vals stay same
       if(yvals[1]-1!= -1){ // make sure you're not reaching out of bounds
       printw(" same col ");
       refresh();
-        if(marked[yvals[1]-1][xvals[0]] == 0){
-
+      printw("%d %d ",yvals[1] -1, xvals[0]);
+      refresh();
+        if(marked[yvals[1]-1][xvals[1]] == 0){
+          printw(" vertical ");
+          refresh();
         return xvals[1];
         }
       }
@@ -509,7 +621,7 @@ int checkPath(int* t, node** adj, int** marked, int x, int y, int size){
       refresh();
       return xvals[1];
     }
-
+*/
 
     // maybe take end of 3 conntected to another block and reset the visited? FIXME
   /*  else if(xvals[1]+1 != x && yvals[1]-1 != -1){
@@ -522,9 +634,11 @@ int checkPath(int* t, node** adj, int** marked, int x, int y, int size){
     /*else{
       return 0;
     }*/
+    return -1;
   }
-  size--;
-}
+//  size--;
+
+
 
 
 if(size == 1){
@@ -566,220 +680,217 @@ refresh();
 
 return -1;
 }
+}
+
 
 int computerSelect(WINDOW*** gb, int x, int y, int colorpair, int** marked, node** adj, int count){
-
- /*int select = 0;
-
-    if(marked[y-1][0] ==1 && count == 0){
-      select = 1;
-      return select;
-    }
-    else if(count == 0 && marked[y-1][0] !=1){
-      select = 0;
-      return select;
-    }
-
-  int head, tail, w,type,greatestpath;
-  node* temp;
-  int type1 =0;
-  int type2 = 0;
-  int type3 = 0;
-
-  initializeQueue(&head, &tail);
-/*  initStack(&head, &tail);
-  printw("hello");
-  refresh();*/
-  /*int* arr = malloc(sizeof(int)*count);
-  int* visited= malloc(sizeof(int)*count);
-  int empty = 0; //flag to check if queue is empty
-  int path = 0; // shows length of path
-    path = 0;
-   int* t2;
-    greatestpath=0;
-    int f = 0;
-    int t[3];
-    int p[3];
-
-  for(int i = 0; i < count; i++){
-    //initializing arrays
-    arr[i] = 0;
-    visited[i] = 0;
+int select;
+  struct node* temp;
+  if(marked[y-1][0] ==1 && count == 0){
+    select = 1;
+    return select;
   }
-
-/*for(int i = 0; i < count; i++){
-  printw(" || ");
-  refresh();
-for(int k = 0; k < count; k++){
-  arr[k] = 0;
-}
-  for (int j = 1; j < 4; j++ ){
-    type = j;
-    path =0;
-  push(i, &tail, arr);
-  while(empty == 0){
-    w = pop(&tail, arr);
-    path++;
-    if(type == 1){
-      type1++;
-    }
-    if(type ==2){
-      type2++;
-    }
-    if(type==3){
-      type3++;
-    }
-    if(visited[w] ==0){
-      visited[w] = 1;
-      temp = adj[w]->next;
-      while(temp){
-        //if(type == temp->type){
-
-        push(temp->v,&tail,arr);
-        printw(" %d is %d to %d ",temp->v,type,w);
-        refresh();
-      //}
-        temp = temp->next;
-      }
-    }
-  empty = isEmpty(&head, &tail);
+  else if(count == 0 && marked[y-1][0] !=1){
+    select = 0;
+    return select;
   }
-  if(path > 3){
-    printw(" 3 iterations ");
-    refresh();
-  }
-}
-}
+//DFS using stack for to visit nodes
+
+int head,tail, m, type;
+int type1greatest = 1;
+int type2greatest = 1;
+int type3greatest =1;
+int type1greatestarr[3];
+int type2greatestarr[3];
+int type3greatestarr[3];
+int type1arr[3];
+int type2arr[3];
+int type3arr[3];
+/////////////////////////////////////////////////////////////////////////////////////////
+initializeStack(&head,&tail);
+int* arr = malloc(sizeof(int)*count); //stack array
+int* visited = malloc(sizeof(int)*count);//visited array
 for(int i = 0; i < count; i++){
   arr[i] = 0;
   visited[i] = 0;
 }
-free(arr);
-//free(head);
-//free(tail);
-//free(t);
-//free(p);
-free(visited);
-*/
-/*  for(int i = 0; i < count; i++){
-  /*  type1 = 0;
-    type2 = 0;
-    type3= 0;*/
-
-  /*  printw(" || ");
-    refresh();// makes sure all vertices are visited
-    for(int j = 1; j < 4; j++){// iterates through all types
-      type = j;
-      path = 0;
-       empty = 0;
-       for(int k=0;  k <  count; k++){
-         arr[k] =0;
-          visited[k] = 0;
-       }
-       if(visited[i] == 0){
-
-         for(int l = 0; l < 3; l++){
-           t[l] = 0;
-         }
-         int whilecount =0;
-         enqueue(&tail, arr, adj[i]->v);
-         //path = 0;
-         while(empty ==0){
-           w = dequeue(arr,&head);
-          // printw("visiting %d ",w);
-           //refresh();
-           if(whilecount != 0){
-           if(type ==1){
-             t[type1] = w;
-             printw(" %d ", type1);
-            f++;
-
-             type1++;
-             if(type1 ==3){
-              t2 = t;
-          //   select = checkPath(t2,adj,marked,x,y,3);
-              if(select != -1){
-                return select;
-              }
-            }
-
-             printw(" type1 == %d ", type1);
-             refresh();
-           }
-           if(type==2){
-             type2++;
-             t[f] = w;
-             printw(" type2 == %d ", type2);
-            f++;
-            if(type2 ==3){
-              t2 = t;
-             select = checkPath(t2,adj,marked,x,y,3);
-             if(select != -1){
-               return select;
-             }
-            }
-            // refresh();
-           }
-           if(type ==3){
-             type3++;
-             t[f] = w;
-            f++;
-             if(type1 ==3){
-                t2 = t;
-              select = checkPath(t2,adj,marked,x,y,3);
-              if(select != -1){
-                return select;
-              }
-             }
-             //printw(" type3 == %d ", type3);
-             //refresh();
-           }
-         }
-
-          path++;
-             if(visited[w]==0){
-
-
-
-               visited[w] = 1;
-              //printw("check");
-               //refresh();
-
-
-            temp = adj[i]->next;
-            while(temp){
-              if(temp->type == type && visited[temp->v] == 0){
-               //printw(" %d %d ", type, temp->v);
-              //refresh();
-
-                enqueue(&tail, arr, temp->v);
-
-              }
-              temp = temp->next;
-            }
-            }
-            whilecount++;
-              empty = isEmpty(&head,&tail);
-     }
-
-      if(path > greatestpath){
-        greatestpath = path;
-        for(int a = 0 ; a < 3; a++){
-          p[a] = t[a];
-        }
-        printw(" new greatest path = %d ",path);
-        refresh();
-      }
-
+int path = 0;
+int type1,type2,type3;
+for(int i = 0; i < count; i++){
+  //for all nodes
+  if(type1 >= type1greatest){
+    type1greatest = type1;
+    for(int k = 0 ; k < 3; k++){
+      type1greatestarr[k] = type1arr[k];
     }
   }
-}
-*/
+  if(type2 >= type2greatest){
+    type2greatest = type2;
+    for(int k = 0 ; k < 3; k++){
+      type2greatestarr[k] = type2arr[k];
+    }
+  }
+  if(type3 >= type3greatest){
+    type3greatest = type3;
+    for(int k = 0 ; k < 3; k++){
+      printw(" %d ",type3arr[k]);
+      refresh();
+      type3greatestarr[k] = type3arr[k];
+    }
+  }
+  for(int k =0; k< 3; k++){
+    type1arr[k] = 0;
+    type2arr[k] = 0;
+    type3arr[k] = 0;
+  }
+  path = 1;
+  type1= 1;
+  type2 = 1;
+  type3 = 1;
 
+  int empty = 0;
+  for(int j = 1; j < 4; j++){
+    type = j;
+    empty = 0;
+  for(int k =0; k < count; k++){
+    visited[k] = 0;
+
+  }
+  path = 1;
+  push(&tail, arr, adj[i]->v);
+  while(empty == 0){
+
+    m = pop(arr,&tail);
+  //  printw(" %d ", m);
+    refresh();
+    if(visited[m] ==0){
+      visited[m] = 1;
+      //printw("visiting %d ", m);
+      //refresh();
+
+      temp = adj[m]->next;
+      while(temp){
+
+        if(visited[temp->v] ==0){
+          if(temp->type == type && type ==1){
+            type1arr[type1-1] = temp->v;
+            type1++;
+            if(type1 == 3){
+              printw("type1 == 3");
+              refresh();
+              select = checkPath(type1arr,adj,marked,x,y,3);
+              if(select != -1){
+                return select;
+              }
+              else{
+                printw("type1 fail");
+                refresh();
+                type1 = 1;
+                type1arr[0]=0;
+                type1arr[1]=0;
+                type1arr[2]=0;
+              }
+            }
+          }
+          if(temp->type == type && type ==2){
+            type2arr[type2-1]=temp->v;
+            type2++;
+            if(type2 == 3){
+              printw("type2 == 3");
+              refresh();
+              select = checkPath(type2arr,adj,marked,x,y,3);
+              if(select != -1){
+                return select;
+              }
+              else{
+                printw("type2 fail");
+                refresh();
+                type2 = 1;
+                type2arr[0]=0;
+                type2arr[1]=0;
+                type2arr[2]=0;
+              }
+            }
+          }
+          if(temp->type == type && type ==3){
+            type3arr[type3-1] = temp->v ;
+            type3++;
+          /*  for(int j = 0; j < type3; j++){
+              printw(" %d ",type)
+            }*/
+            if(type3 == 3){
+              printw("type1 == 3");
+              refresh();
+              select = checkPath(type3arr,adj,marked,x,y,3);
+              if(select != -1){
+                return select;
+              }
+              else{
+                printw("type3 fail");
+                refresh();
+                type3 = 1;
+                type3arr[0]=0;
+                type3arr[1]=0;
+                type3arr[2]=0;
+              }
+            }
+          }
+
+          /*  printw("pushing type %d with a %d current ",temp->type, type);
+          if(temp->type == type){
+            path++;
+            printw("pathhhhhhh");
+
+          }*/
+        /*  if(type == 3){
+            printw("type = 3 ");
+            refresh();
+          }
+          if(temp->type == 3){
+            printw("temp  type 3 and type %d",type);
+            refresh();
+          }*/
+          //  printw(" temp type = %d current type = %d ", temp->type, type);
+          push(&tail, arr, temp->v);
+        }
+        temp = temp->next;
+      }
+    }
+    empty = isEmpty(&head,&tail);
+  }
+  }
+  printw(" %d, %d %d ",type1,type2,type3 );
+  refresh();
+}
+if(type1greatest > type2greatest && type1greatest>type3greatest){
+  printw(" type1 = %d" , type1greatest);
+    refresh();
+    return checkPath(type1greatestarr,adj,marked,x,y,type1greatest);
+}
+if(type2greatest > type1greatest && type2greatest>type3greatest){
+  printw(" type2 = %d" , type2greatest);
+  refresh();
+    return checkPath(type2greatestarr,adj,marked,x,y,type2greatest);
+}
+if(type3greatest > type1greatest && type3greatest>type2greatest){
+  printw(" type3 = %d" , type3greatest);
+  refresh();
+  /*for(int i = 0; i < 3; i++){
+    printw("  %d  ",type3greatestarr[i]);
+  }*/
+  //refresh();
+  return checkPath(type3greatestarr,adj,marked,x,y,type3greatest);
+}
+if(type1greatest == type2greatest || type1 == type3greatest){
+  printw(" equality %d %d ", type1arr[0]);
+  refresh();
+
+    return checkPath(type1arr,adj,marked,x,y,type1greatest);
+}
   ////////////////////////////////////////////////////////////////////////
 
 //base cases
-int select = 0;
+/*int select = 0;
   if(marked[y-1][0] ==1 && count == 0){
     select = 1;
     return select;
@@ -871,11 +982,174 @@ int path = 0; // shows length of path
 }
 
 //breadth first search
-getch();
+getch();*/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 return 0;
 }
 
+int Check(int t[3], node** adj, int x, int y, int** marked, int count, int type){
+  if(type == 1){
+    printw(" type 1 check not implemented ");
+    refresh();
+    return -1;
+  }
+  else{
+  /*  min = 0;
+    max = 0;
+    for(int i = 0; i < 3; i++){
+      if(adj[t[i]]->x < min){
+        min = adj[t[i]]->x < min;
+      }
+      else if(adj[t[i]]->x > max);
+    }*/
+    printw(" type 2 check not implemented ");
+    refresh();
+    return -1;
+  }
+
+}
+int DFS(node** adj, int** marked, int x, int y, int count){
+  int select;
+  int type1 = 0;
+  int type2 = 0;
+  int type1arr[3];
+  int type2arr[3];
+  //int type3 = 0;
+    struct node* temp;
+    if(marked[y-1][0] ==1 && count == 0){
+      select = 1;
+      return select;
+    }
+    else if(count == 0 && marked[y-1][0] !=1){
+      select = 0;
+      return select;
+    }
+
+    int head,tail, m, type;
+    int empty = 0;
+    int check;
+    int flag;
+    initializeStack(&head,&tail);
+    int* arr = malloc(sizeof(int)*count); //stack array
+    int* visited = malloc(sizeof(int)*count);
+    for(int i = 0 ; i < count; i++){ //assure you visit every node
+      empty = 0;
+       type1 = 1;
+       type2 = 1;
+       for(int j = 0 ; j < 3; j++){
+         type1arr[j] = 0;
+         type2arr[j] = 0;
+       }
+      for(int j = 0; j < count; j++){
+        visited[j] = 0;
+      }
+     //   type3 = 0;
+      //printw(" %d ",adj[i]->v);
+      //refresh();
+      type1arr[0] = adj[i]->v;
+      type2arr[0] = adj[i]->v;
+      type1++;
+      type2++;
+      push(&tail, arr, adj[i]->v);
+      while(empty == 0){
+        m = pop(arr, &tail);
+
+        //printw(" popping %d ",m);
+        //refresh();
+        if(visited[m] == 0){
+        //  printw(" visiting %d ", m);
+          visited[m] = 1;
+          temp= adj[i]->next;
+          while(temp){
+            //check for types and increment accordingly add to arrays
+            //if type1 == 3 or type2 ==3
+            if(visited[temp->v] == 0){
+            if(temp->type ==1){
+            /*  printw(" adding v= %d tempv = %d type1 ",adj[i]->v, temp->v);
+              refresh();
+              /*printw("type 1");
+              refresh();*/
+             /*flag = 0;
+              for(int k = 0; k < type1; k++){
+                if(type1arr[k] == temp->v){
+                  flag = 1;
+                }
+              }*/
+              if(flag == 0){
+              type1arr[type1-1] = temp->v;
+              type1++;
+            /*  printw("current node = %d at (%d,%d)",m, adj[m]->x, adj[m]->y);
+              printw(" adding (%d, %d) %d ", adj[type1arr[type1-2]]->x, adj[type1arr[type1-2]]->y, adj[type1arr[type1-2]]->v);*/
+              refresh();
+            }
+          }
+              if(type1 == 4){
+                struct node* q;
+                for(int i = 0; i < 3; i++){
+                  q= adj[type1arr[i]]->next;
+                printw(" (%d, %d) ", adj[type1arr[i]]->x, adj[type1arr[i]]->y);
+                printw(" element i = %d adjacency: ",i);
+                while(q){
+                  printw(" v= %d (%d,%d), ",q->v, q->x,q->y);
+                  q = q->next;
+                }
+                refresh();
+                }
+
+                check = Check(type1arr, adj, x,y,marked, type1-1, 1);
+                if(check!= -1){
+                  return check;
+                }
+                type1 = 1;
+                type1arr[0]= adj[i]->v;
+                for(int j = 1; j < 3; j++){
+                  type1arr[j] = 0;
+                }
+              }
+
+            if(temp->type == 2){
+              flag = 0;
+              for(int k = 0; k < type2; k++){
+                if(type2arr[k] == temp->v){
+                  flag = 1;
+                }
+              }
+              if(flag == 0){
+              type2arr[type2-1] = temp->v;
+              type2++;
+
+
+          /*    printw(" adding v= %d tempv = %d type2 ",adj[i]->v, temp->v);
+              refresh();*/
+            }
+              if(type2 == 4){
+                for(int i = 0; i < 3; i++){
+                  printw(" (%d, %d) ", adj[type2arr[i]]->x, adj[type2arr[i]]->y);
+                  refresh();
+                }
+              check = Check(type2arr, adj, x,y,marked, type2-1, 2);
+              if(check!= -1){
+                return check;
+              }
+              type2 = 1;
+              type2arr[0] == adj[i]->v;
+              for(int j = 1; j < 3; j++){
+                type2arr[j] = 0;
+              }
+              }
+            }
+            push(&tail,arr,temp->v);
+          //  temp = temp->next;
+        }
+        temp = temp->next;
+        }
+        }
+        empty = isEmpty(&head, &tail);
+      }
+
+    }
+  return rand() % 10;
+}
 
 //function for actual game process
 int runGame(WINDOW*** gb, int x, int y, int mode){
@@ -911,8 +1185,8 @@ while(ch != 'q'){
 if(colorcheck %2== 0 && mode ==1){
 //int* selected; //pointer to store return value of what the AI determines is the best x just like select col
 
-  col = computerSelect(gb,x,y,colorcheck % 2, marked, p2adj, p2count);
-
+  //col = computerSelect(gb,x,y,colorcheck % 2, marked, p2adj, p2count);
+  col = DFS(p2adj, marked, x, y, p2count);
   moveSpot(gb,col, colarr[col], y, colorcheck % 2);
 }
 else if(colorcheck%2 == 0 && mode ==2){
@@ -942,6 +1216,9 @@ else if(colorcheck%2 == 0 && mode ==2){
     }
     struct node* newNode = createNode(col, y-colarr[col], p2count);
     addToAdjacency(p2adj, newNode, col, y-colarr[col], p2count);
+
+    printw(" (%d,%d) at v= %d",col,y-colarr[col], p2count);
+    refresh();
     p2count++;
   winner =  checkForWinner(2,p2count, marked, col, y-colarr[col], x, y);
   }
