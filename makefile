@@ -1,2 +1,2 @@
-main: main.c UI.c game.c
-	gcc  main.c UI.c game.c -lpdcurses -o main
+main: main.c UI.c game.c stack.c
+	gcc  main.c UI.c game.c stack.c -lncurses -std=c11 -Wall -o connectfour
